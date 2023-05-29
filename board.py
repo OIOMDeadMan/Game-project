@@ -2,12 +2,11 @@ import pygame
 import os
 from game_assets.locations import image
 import Enemies
-import openai
 
 
-"""GPT API: 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"""
+#"""GPT API: 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"""
 
-openai.api_key = "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"
+#openai.api_key = "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"
 
 class Board:
     # atrybuty planszy
