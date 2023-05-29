@@ -2,7 +2,7 @@ import pygame
 import hero_file
 import board
 import interface
-
+import music
 
 class Game:
     WIDTH, HEIGHT = 1280, 640
