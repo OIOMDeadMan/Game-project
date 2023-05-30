@@ -2,19 +2,16 @@ import pygame
 import hero_file
 import board
 import interface
-import items
 
-
+import item
 class Game:
     WIDTH, HEIGHT = 1280, 640
     FPS = 60
     hsp = [WIDTH / 2, HEIGHT / 2]  # hero screen position
 
     # clicks = []
-
     def __init__(self):
         self.WIN = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-
         self.stats_win, self.inv_win = self.create_interface()
         self.heroes = self.create_heroes()
         self.board = self.create_map()
@@ -25,6 +22,7 @@ class Game:
 
         items.spawn_item(items.generate_item(1, 1), self.board.grid[20][20])
 
+        self.music_player()
         self.running = True
         self.run()
 
@@ -42,6 +40,10 @@ class Game:
 
         pygame.quit()
 
+    def music_player(self):
+        pygame.mixer.init()
+        self.main_music = pygame.mixer.music.load(r'game_assets\Music\man-is-he-mega.wav')
+        pygame.mixer.music.play(-1)
     def draw_window(self, engine, bg):
         self.WIN.blit(bg.board_image, (self.board.map_position_x, self.board.map_position_y))
 

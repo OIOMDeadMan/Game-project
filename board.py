@@ -3,8 +3,6 @@ import os
 from game_assets.locations import image
 import Enemies
 
-"""GPT API: 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"""
-
 class Board:
     # atrybuty planszy
     C = 32
@@ -33,6 +31,13 @@ class Board:
 
         self.map_position_x = self.starting_view_position_x
         self.map_position_y = self.starting_view_position_y
+
+
+        self.spawn_objects()
+
+    def spawn_objects(self):
+        Enemies.Enemy(self.grid[20][20])
+
 
 
 class Cell:
