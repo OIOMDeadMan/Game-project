@@ -40,8 +40,7 @@ class Board:
         self.spawn_objects()
 
     def spawn_objects(self):
-        enemy = Enemies.Enemy()
-        enemy.spawn(self.grid[20][20])
+        Enemies.Enemy(self.grid[20][20])
 
 
 class Cell:

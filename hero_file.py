@@ -12,7 +12,7 @@ class HeroModel:
         self.position_cell = position_cell
         self.position_x = position_cell.x
         self.position_y = position_cell.y
-        self.VEL = 8
+        self.VEL = 4
         self.orientation = "S"
         self.is_moving = False
 
