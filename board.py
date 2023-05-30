@@ -2,12 +2,8 @@ import pygame
 import os
 from game_assets.locations import image
 import Enemies
-import openai
-
 
 """GPT API: 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"""
-
-openai.api_key = "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"
 
 class Board:
     # atrybuty planszy
@@ -37,12 +33,6 @@ class Board:
 
         self.map_position_x = self.starting_view_position_x
         self.map_position_y = self.starting_view_position_y
-
-        self.spawn_objects()
-
-    def spawn_objects(self):
-        enemy = Enemies.Enemy()
-        enemy.spawn(self.grid[20][20])
 
 
 class Cell:

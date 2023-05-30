@@ -22,3 +22,8 @@ class InventoryWin(Interface):
     def __init__(self):
         super().__init__()
         self.inv_window = pygame.image.load("game_assets/UI/inventory.png")
+
+class InventoryCell:
+    def __init__(self):
+        self.position = position
+

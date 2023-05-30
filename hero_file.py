@@ -12,9 +12,11 @@ class HeroModel:
         self.position_cell = position_cell
         self.position_x = position_cell.x
         self.position_y = position_cell.y
-        self.VEL = 8
+        self.VEL = 4
         self.orientation = "S"
         self.is_moving = False
+
+        self.inventory = []
 
         self.images = {}
         self.load_hero_images()
@@ -188,33 +190,34 @@ class HeroModel:
     def interact_cell(self, orientation, grid):
         # interaction with a cell that hero s standing on
         if self.position_cell.content is not None:
-            self.position_cell.content.interact()
+            self.position_cell.content.interact(self)
 
+        else:
         # interaction with a cell that hero is looking at
-        try:
-            if orientation == "N":
-                interacted_cell = grid[self.position_cell.col][self.position_cell.row - 1]
-                interacted_cell.content.interact()
+            try:
+                if orientation == "N":
+                    interacted_cell = grid[self.position_cell.col][self.position_cell.row - 1]
+                    interacted_cell.content.interact()
 
-            elif orientation == "W":
-                interacted_cell = grid[self.position_cell.col - 1][self.position_cell.row]
-                interacted_cell.content.interact()
+                elif orientation == "W":
+                    interacted_cell = grid[self.position_cell.col - 1][self.position_cell.row]
+                    interacted_cell.content.interact()
 
-            elif orientation == "S":
-                interacted_cell = grid[self.position_cell.col][self.position_cell.row + 1]
-                interacted_cell.content.interact()
+                elif orientation == "S":
+                    interacted_cell = grid[self.position_cell.col][self.position_cell.row + 1]
+                    interacted_cell.content.interact()
 
-            elif orientation == "E":
-                interacted_cell = grid[self.position_cell.col + 1][self.position_cell.row]
-                interacted_cell.content.interact()
-        except AttributeError:
-            print("Nic tu nie ma")
+                elif orientation == "E":
+                    interacted_cell = grid[self.position_cell.col + 1][self.position_cell.row]
+                    interacted_cell.content.interact()
+            except AttributeError:
+                print("Nic tu nie ma")
 
 
 class Hero:
     def __init__(self, name):
         self.name = name
-        self.eq = dict(helmet=items.wooden_helmet, armor=items.no_item, trousers=items.no_item,
+        self.eq = dict(helmet=items.no_item, armor=items.no_item, trousers=items.no_item,
                        boots=items.no_item, hand1=items.no_item, hand2=items.no_item, bracers=items.no_item,
                        gloves=items.no_item, bracelet=items.no_item, necklace=items.no_item,
                        amulet=items.no_item)

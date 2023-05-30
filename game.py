@@ -2,11 +2,12 @@ import pygame
 import hero_file
 import board
 import interface
+import items
 
 
 class Game:
     WIDTH, HEIGHT = 1280, 640
-    FPS = 120
+    FPS = 60
     hsp = [WIDTH / 2, HEIGHT / 2]  # hero screen position
 
     # clicks = []
@@ -21,6 +22,8 @@ class Game:
         self.hero_index = 0
         self.selected_hero = self.heroes[self.hero_index]
         self.selected_hero_frame = None
+
+        items.spawn_item(items.generate_item(1, 1), self.board.grid[20][20])
 
         self.running = True
         self.run()
@@ -42,10 +45,13 @@ class Game:
     def draw_window(self, engine, bg):
         self.WIN.blit(bg.board_image, (self.board.map_position_x, self.board.map_position_y))
 
+        self.draw_map_objects()
+
         self.WIN.blit(engine.current_image, (self.hsp[0], self.hsp[1] - bg.C / 2))
 
         self.draw_interface()
         self.draw_hero_icons()
+
 
         # for v in self.clicks:
         #     pygame.draw.rect(self.WIN, (255, 0, 0),
@@ -157,6 +163,14 @@ class Game:
             except AttributeError:
                 pass
         print(hero.stats['STR'])
+
+    def draw_map_objects(self):
+        for row in self.board.grid:
+            for cell in row:
+                if cell.content is not None:
+                    self.WIN.blit(pygame.transform.scale(cell.content.icon, (32, 32)),
+                                  ((cell.col * self.board.C + self.board.map_position_x),
+                                  (cell.row * self.board.C + self.board.map_position_y)))
 
 
 g = Game()

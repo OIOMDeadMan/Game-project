@@ -1,6 +1,28 @@
-import os
-import random
 import pygame.image
+import random as rd
+
+
+class Inventory:
+    inv_pos = 632, 48
+
+    def __init__(self):
+        self.slots = []
+        slot_count_per_row = 640 // InvSlot.size[0]
+
+        for row in range(Inventory.inv_pos[1] + 8, 544 // InvSlot.size[1]):
+            for col in range(slot_count_per_row):
+                x = Inventory.inv_pos[0] + 8 + col * InvSlot.size[0]
+                y = Inventory.inv_pos[1] + 8 + row * InvSlot.size[1]
+                self.slots.append(InvSlot((x, y)))
+
+
+class InvSlot:
+    size = 64, 64
+
+    def __init__(self, position):
+        self.content = None
+        self.image = pygame.image.load("game_assets/items/no_item.png")
+        self.position = position
 
 
 class EqItem:
@@ -17,15 +39,20 @@ class EqItem:
                 "amulet": (520, 237),
                 "no_item": (-1, -1)}
 
-    def __init__(self, item_type, item_icon=pygame.image.load("game_assets/items/no_item.png")):
-        self.iname = None
+    item_type_list = [key for key, value in eq_slots.items()]
+    item_name_list = {}
+
+    def __init__(self, item_name, item_type, item_rarity, required_lvl,
+                 item_armor, item_str, item_dex, item_int, item_luc,
+                 item_class, item_icon=pygame.image.load("game_assets/items/sword.png")):
+        self.iname = item_name
         self.itype = item_type
         self.icon = item_icon
-        self.irarity = None
-        self.ilvl = None
+        self.irarity = item_rarity
+        self.ilvl = required_lvl
         self.draw_position = EqItem.eq_slots[item_type]
-        self.iclasses = None
-        self.istats = {"ARMOR": 0, "STR": 0, "DEX": 0, "INT": 0, "LUC": 0}
+        self.iclasses = item_class
+        self.istats = {"ARMOR": item_armor, "STR": item_str, "DEX": item_dex, "INT": item_int, "LUC": item_luc}
 
     def equip_item(self, selected_hero):
         if selected_hero.hero_class in self.iclasses and selected_hero.lvl == self.ilvl:
@@ -35,69 +62,62 @@ class EqItem:
     def unequip_item(item, selected_hero):
         selected_hero.eq[item.type] = item.__class__
 
-
-no_item = EqItem("no_item", None)
-
-wooden_helmet = EqItem("helmet",
-                       pygame.image.load("game_assets/items/helmet_test.png"))
-helmet_names = ['Drewniany hełm', 'Skórzany hełm', 'Stalowy hełm', 'Smoczy hełm']
-rarity_types = ['common', 'rare', 'epic', 'legendary']
-class_types = ['warrior', 'wizard', 'rogue']
-def random_item(obj, name_list, rarity_list, class_list):
-    obj.iname = random.choice(name_list)
-    obj.irarity = random.choice(rarity_list)
-    obj.iclasses = random.choice(class_list)
-    obj.ilvl = random.randint(1,100)
-    obj.istats['ARMOR'] = int(obj.ilvl * 2)
-    obj.istats['STR'] = int(obj.ilvl * 1)
-    obj.istats['DEX'] = int(obj.ilvl * 1)
-    obj.istats['INT'] = int(obj.ilvl * 1)
-    obj.istats['LUC'] = int(obj.ilvl * 1)
-    match obj.iname:
-        case 'Drewniany hełm':
-            obj.istats['ARMOR'] += 10
-        case 'Skórzany hełm':
-            obj.istats['ARMOR'] += 20
-        case 'Stalowy hełm':
-            obj.istats['ARMOR'] += 40
-        case 'Smoczy hełm':
-            obj.istats['ARMOR'] += 50
-    match obj.irarity:
-        case 'common':
-            obj.istats['ARMOR'] += 10
-            obj.istats['STR'] += 2
-            obj.istats['DEX'] += 2
-            obj.istats['INT'] += 2
-            obj.istats['LUC'] += 2
-        case 'rare':
-            obj.istats['ARMOR'] += 20
-            obj.istats['STR'] += 4
-            obj.istats['DEX'] += 4
-            obj.istats['INT'] += 4
-            obj.istats['LUC'] += 4
-        case 'epic':
-            obj.istats['ARMOR'] += 40
-            obj.istats['STR'] += 6
-            obj.istats['DEX'] += 6
-            obj.istats['INT'] += 6
-            obj.istats['LUC'] += 6
-        case 'legendary':
-            obj.istats['ARMOR'] += 80
-            obj.istats['STR'] += 10
-            obj.istats['DEX'] += 10
-            obj.istats['INT'] += 10
-            obj.istats['LUC'] += 10
-    match obj.iclasses:
-        case 'warrior':
-            obj.istats['STR'] += 5
-        case 'wizard':
-            obj.istats['INT'] += 5
-        case 'rogue':
-            obj.istats['DEX'] += 5
+    def interact(self, hero):
+        hero.inventory.append(self)
+        hero.position_cell.content = None
 
 
-helm = EqItem("helmet",
-                       pygame.image.load("game_assets/items/helmet_test.png"))
+no_item = EqItem(None, "no_item", None, None, None, None, None, None, None, None)
 
-random_item(helm, helmet_names, rarity_types,class_types)
-print(vars(helm))
+
+def generate_item(minlvl, maxlvl):
+    rarity_list = {"common": 1, "uncommon": 1.2, "epic": 1.5, "legendary": 2}
+    classes_coefficient = {"warrior": {"ARMOR": 4, "STR": 3, "INT": 0.5, "DEX": 1, "LUC": 2},
+                           "wizard": {"ARMOR": 2, "STR": 0.5, "INT": 3, "DEX": 0.5, "LUC": 2},
+                           "rogue": {"ARMOR": 3, "STR": 1, "INT": 0.5, "DEX": 3, "LUC": 2}}
+    rarity_drop_chance = [50, 40, 8, 2]
+
+    itype = rd.choice([key for key, value in EqItem.eq_slots.items()])
+
+    with open(f"game_assets/items/{itype}_names.txt", "r") as file:
+        content = file.read()
+        names = content.split(", ")
+        iname = rd.choice(names)
+
+    irarity = rd.choices(list(rarity_list.keys()), weights=rarity_drop_chance)[0]
+
+    ilvl = rd.randint(int(minlvl), int(maxlvl))
+
+    iclass = rd.choice(list(classes_coefficient.keys()))
+
+    item_modificator = ilvl * rarity_list[irarity]
+
+    iarmor = rd.randint(int(item_modificator * classes_coefficient[iclass]["ARMOR"] * 10),
+                        int(item_modificator * classes_coefficient[iclass]["ARMOR"] * 12))
+
+    istr = rd.randint(int(item_modificator * classes_coefficient[iclass]["STR"] * 1),
+                      int(item_modificator * classes_coefficient[iclass]["STR"] * 1.2))
+
+    iint = rd.randint(int(item_modificator * classes_coefficient[iclass]["INT"] * 1),
+                      int(item_modificator * classes_coefficient[iclass]["INT"] * 1.2))
+
+    idex = rd.randint(int(item_modificator * classes_coefficient[iclass]["DEX"] * 1),
+                      int(item_modificator * classes_coefficient[iclass]["DEX"] * 1.2))
+
+    iluc = rd.randint(int(item_modificator * classes_coefficient[iclass]["LUC"] * 1),
+                      int(item_modificator * classes_coefficient[iclass]["LUC"] * 1.2))
+
+    item = EqItem(iname, itype, irarity, ilvl, iarmor, istr, idex, iint, iluc, iclass)
+
+    return item
+
+
+def spawn_item(item, cell):
+    cell.content = item
+
+# min_lvl = input("min lvl: ")
+# max_lvl = input("max lvl: ")
+#
+# it = generate_item(min_lvl, max_lvl)
+# print(f"Nazwa: {it.iname}, typ: {it.itype}, lvl: {it.ilvl}, klasa: {it.iclasses}, rzedkość: {it.irarity},"
+#       f"Siła: {it.istats['STR']}, Zręka: {it.istats['DEX']}, INT: {it.istats['INT']}, Luck: {it.istats['LUC']}")
